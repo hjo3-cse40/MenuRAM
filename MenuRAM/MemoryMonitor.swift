@@ -1,5 +1,6 @@
 import Combine
 import Darwin
+import Dispatch
 import Foundation
 
 /// Reads macOS VM stats via Darwin host APIs and publishes them for the menu bar UI.
@@ -11,26 +12,29 @@ final class MemoryMonitor: ObservableObject {
     @Published private(set) var wiredBytes: UInt64 = 0
     @Published private(set) var compressedBytes: UInt64 = 0
     @Published private(set) var availableBytes: UInt64 = 0
+    @Published private(set) var pressure: MemoryPressureLevel = .normal
+    @Published private(set) var topProcesses: [ProcessMemoryInfo] = []
 
     private var timer: Timer?
+    private var pressureSource: DispatchSourceMemoryPressure?
+    private var refreshProcessesOnNextTick = true
 
     var menuBarTitle: String {
-        "\(formatGB(usedBytes)) / \(formatGB(totalBytes)) GB"
+        "\(MemoryFormat.gb(usedBytes)) / \(MemoryFormat.gb(totalBytes)) GB"
     }
 
-    var availableText: String { "Available: \(formatGB(availableBytes)) GB" }
-    var appText: String { "App Memory: \(formatGB(appBytes)) GB" }
-    var wiredText: String { "Wired Memory: \(formatGB(wiredBytes)) GB" }
-    var compressedText: String { "Compressed: \(formatGB(compressedBytes)) GB" }
+    var availableText: String { "Available: \(MemoryFormat.gb(availableBytes)) GB" }
+    var pressureText: String { "Pressure: \(pressure.rawValue)" }
 
     init() {
         totalBytes = ProcessInfo.processInfo.physicalMemory
         refresh()
+        startPressureMonitor()
         start()
     }
 
     func start() {
-        stop()
+        stopTimer()
         let timer = Timer(timeInterval: 2.0, repeats: true) { [weak self] _ in
             Task { @MainActor in
                 self?.refresh()
@@ -41,11 +45,26 @@ final class MemoryMonitor: ObservableObject {
     }
 
     func stop() {
+        stopTimer()
+        pressureSource?.cancel()
+        pressureSource = nil
+    }
+
+    func refresh() {
+        refreshHostStats()
+        // Process scan is heavier; refresh about every 4 seconds.
+        if refreshProcessesOnNextTick {
+            refreshTopProcesses()
+        }
+        refreshProcessesOnNextTick.toggle()
+    }
+
+    private func stopTimer() {
         timer?.invalidate()
         timer = nil
     }
 
-    func refresh() {
+    private func refreshHostStats() {
         var stats = vm_statistics64()
         // Use stride (not size). Wrong count can return incomplete/wrong fields.
         var count = mach_msg_type_number_t(
@@ -82,10 +101,58 @@ final class MemoryMonitor: ObservableObject {
         availableBytes = available
         usedBytes = app + wired + compressed
         totalBytes = ProcessInfo.processInfo.physicalMemory
+
+        // Keep pressure in sync when sysctl is readable; DispatchSource covers transitions.
+        if let level = Self.readPressureLevel() {
+            pressure = level
+        }
     }
 
-    private func formatGB(_ bytes: UInt64) -> String {
-        let gb = Double(bytes) / 1_073_741_824.0
-        return String(format: "%.1f", gb)
+    private func refreshTopProcesses() {
+        topProcesses = ProcessMemoryProvider.topProcesses(limit: 5)
+    }
+
+    private func startPressureMonitor() {
+        if let level = Self.readPressureLevel() {
+            pressure = level
+        }
+
+        let source = DispatchSource.makeMemoryPressureSource(
+            eventMask: [.normal, .warning, .critical],
+            queue: .main
+        )
+        source.setEventHandler { [weak self, weak source] in
+            guard let self, let source else { return }
+            let event = source.data
+            Task { @MainActor in
+                if event.contains(.critical) {
+                    self.pressure = .critical
+                } else if event.contains(.warning) {
+                    self.pressure = .warning
+                } else if event.contains(.normal) {
+                    self.pressure = .normal
+                }
+            }
+        }
+        source.resume()
+        pressureSource = source
+    }
+
+    /// Reads `kern.memorystatus_vm_pressure_level` when permitted.
+    /// 0 = normal, 1 = warning, 2+ = critical.
+    private static func readPressureLevel() -> MemoryPressureLevel? {
+        var level: Int32 = 0
+        var size = MemoryLayout<Int32>.size
+        let result = sysctlbyname("kern.memorystatus_vm_pressure_level", &level, &size, nil, 0)
+        guard result == 0 else { return nil }
+
+        switch level {
+        case 0:
+            return .normal
+        case 1:
+            return .warning
+        default:
+            return .critical
+        }
     }
 }

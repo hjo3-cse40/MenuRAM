@@ -9,12 +9,16 @@
 /* Begin PBXBuildFile section */
 		A10000000000000000000001 /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000011 /* App.swift */; };
 		A10000000000000000000002 /* MemoryMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000012 /* MemoryMonitor.swift */; };
+		A10000000000000000000003 /* MemoryBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000013 /* MemoryBarView.swift */; };
+		A10000000000000000000004 /* ProcessMemory.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000014 /* ProcessMemory.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		A10000000000000000000010 /* MenuRAM.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MenuRAM.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A10000000000000000000011 /* App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
 		A10000000000000000000012 /* MemoryMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoryMonitor.swift; sourceTree = "<group>"; };
+		A10000000000000000000013 /* MemoryBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoryBarView.swift; sourceTree = "<group>"; };
+		A10000000000000000000014 /* ProcessMemory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessMemory.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -41,6 +45,8 @@
 			children = (
 				A10000000000000000000011 /* App.swift */,
 				A10000000000000000000012 /* MemoryMonitor.swift */,
+				A10000000000000000000013 /* MemoryBarView.swift */,
+				A10000000000000000000014 /* ProcessMemory.swift */,
 			);
 			path = MenuRAM;
 			sourceTree = "<group>";
@@ -118,6 +124,8 @@
 			files = (
 				A10000000000000000000001 /* App.swift in Sources */,
 				A10000000000000000000002 /* MemoryMonitor.swift in Sources */,
+				A10000000000000000000003 /* MemoryBarView.swift in Sources */,
+				A10000000000000000000004 /* ProcessMemory.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -2,35 +2,36 @@
 
 Native macOS menu bar app. Shows live RAM use.
 
-## MVP
+## Features
 
 **Menu bar**
 
-- Shows `Used / Total GB` (example: `12.4 / 32 GB`)
+- Colored pressure dot + `Used / Total GB`
 - No Dock icon (`LSUIElement`)
 
-**Dropdown**
+**Popover (click the menu bar item)**
 
 - Available (free + reclaimable)
-- App Memory
-- Wired Memory
-- Compressed
+- Pressure: Normal / Warning / Critical
+- Color breakdown bar (App / Wired / Compressed / Other)
+- Top 5 apps by RAM
 - Quit
 
 ## Tech
 
-- SwiftUI `MenuBarExtra`
+- SwiftUI `MenuBarExtra` (`.window` style)
 - `ObservableObject` `MemoryMonitor`
 - Darwin: `host_statistics64` / `HOST_VM_INFO64`
-- Refresh every 2 seconds
-- Used ≈ App + Wired + Compressed
-- App = internal pages (not internal − compressed)
-- Available = free + speculative + inactive + purgeable
+- Memory pressure via sysctl + `DispatchSource`
+- Top processes via `libproc`
+- Host stats every 2 seconds; top apps about every 4 seconds
 
 ## Files
 
-- `MenuRAM/App.swift` — menu bar UI
-- `MenuRAM/MemoryMonitor.swift` — RAM stats
+- `MenuRAM/App.swift` — menu bar + popover UI
+- `MenuRAM/MemoryMonitor.swift` — RAM + pressure
+- `MenuRAM/MemoryBarView.swift` — color bar
+- `MenuRAM/ProcessMemory.swift` — top processes
 - `MenuRAM.xcodeproj` — Xcode project
 
 ## Requirements
@@ -46,15 +47,9 @@ Native macOS menu bar app. Shows live RAM use.
 2. Pick `MenuRAM.xcodeproj`
 3. Destination: My Mac
 4. Press Run (▶)
-5. Check the menu bar for `Used / Total GB`
-6. Use Quit in the dropdown to stop
-
-## Later (not MVP)
-
-- Color breakdown bar
-- Available / free headroom
-- Top apps list
+5. Click the menu bar item to open the popover
+6. Use Quit to stop
 
 ## Status
 
-MVP builds. Ready to run from Xcode.
+Popover overview with pressure, color bar, and top 5 apps.
