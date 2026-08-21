@@ -10,6 +10,14 @@ Native macOS menu bar app for live RAM, pressure, and swap.
   <em>Always-on used / total in the menu bar. Click for the rest. No Dock icon.</em>
 </p>
 
+<p align="center">
+  <img src="docs/menuram-menubar.png" alt="MenuRAM extra in the macOS menu bar showing used and total RAM next to battery, Wi-Fi, and Control Center" width="420">
+</p>
+
+<p align="center">
+  <em>Lives in the menu bar.</em>
+</p>
+
 ## Features
 
 - **Menu bar:** pressure color + `Used / Total GB`
