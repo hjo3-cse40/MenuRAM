@@ -7,6 +7,8 @@ struct MenuRAMApp: App {
 
     var body: some Scene {
         MenuBarExtra {
+            Text(monitor.availableText)
+            Divider()
             Text(monitor.appText)
             Text(monitor.wiredText)
             Text(monitor.compressedText)

@@ -10,6 +10,7 @@ final class MemoryMonitor: ObservableObject {
     @Published private(set) var appBytes: UInt64 = 0
     @Published private(set) var wiredBytes: UInt64 = 0
     @Published private(set) var compressedBytes: UInt64 = 0
+    @Published private(set) var availableBytes: UInt64 = 0
 
     private var timer: Timer?
 
@@ -17,6 +18,7 @@ final class MemoryMonitor: ObservableObject {
         "\(formatGB(usedBytes)) / \(formatGB(totalBytes)) GB"
     }
 
+    var availableText: String { "Available: \(formatGB(availableBytes)) GB" }
     var appText: String { "App Memory: \(formatGB(appBytes)) GB" }
     var wiredText: String { "Wired Memory: \(formatGB(wiredBytes)) GB" }
     var compressedText: String { "Compressed: \(formatGB(compressedBytes)) GB" }
@@ -45,8 +47,9 @@ final class MemoryMonitor: ObservableObject {
 
     func refresh() {
         var stats = vm_statistics64()
+        // Use stride (not size). Wrong count can return incomplete/wrong fields.
         var count = mach_msg_type_number_t(
-            MemoryLayout<vm_statistics64>.size / MemoryLayout<integer_t>.size
+            MemoryLayout<vm_statistics64_data_t>.stride / MemoryLayout<integer_t>.stride
         )
 
         let result = withUnsafeMutablePointer(to: &stats) { pointer in
@@ -58,15 +61,25 @@ final class MemoryMonitor: ObservableObject {
         guard result == KERN_SUCCESS else { return }
 
         let pageSize = UInt64(vm_kernel_page_size)
+
+        // On current macOS, internal pages are anonymous/app-resident and are
+        // already separate from compressor pages. Do not subtract compressed.
+        let app = UInt64(stats.internal_page_count) * pageSize
         let wired = UInt64(stats.wire_count) * pageSize
         let compressed = UInt64(stats.compressor_page_count) * pageSize
-        let internalPages = UInt64(stats.internal_page_count) * pageSize
-        // Activity Monitor–style App Memory ≈ internal pages minus compressed pages.
-        let app = internalPages > compressed ? internalPages - compressed : 0
+
+        // Headroom: free pages + pages macOS can usually reclaim for apps.
+        let available = (
+            UInt64(stats.free_count)
+                + UInt64(stats.speculative_count)
+                + UInt64(stats.inactive_count)
+                + UInt64(stats.purgeable_count)
+        ) * pageSize
 
         appBytes = app
         wiredBytes = wired
         compressedBytes = compressed
+        availableBytes = available
         usedBytes = app + wired + compressed
         totalBytes = ProcessInfo.processInfo.physicalMemory
     }

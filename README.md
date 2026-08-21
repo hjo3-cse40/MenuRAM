@@ -11,6 +11,7 @@ Native macOS menu bar app. Shows live RAM use.
 
 **Dropdown**
 
+- Available (free + reclaimable)
 - App Memory
 - Wired Memory
 - Compressed
@@ -23,6 +24,8 @@ Native macOS menu bar app. Shows live RAM use.
 - Darwin: `host_statistics64` / `HOST_VM_INFO64`
 - Refresh every 2 seconds
 - Used ≈ App + Wired + Compressed
+- App = internal pages (not internal − compressed)
+- Available = free + speculative + inactive + purgeable
 
 ## Files
 
@@ -45,14 +48,6 @@ Native macOS menu bar app. Shows live RAM use.
 4. Press Run (▶)
 5. Check the menu bar for `Used / Total GB`
 6. Use Quit in the dropdown to stop
-
-**In Terminal**
-
-```bash
-cd /Users/samjo/GITHUB_REPO/menuram
-xcodebuild -scheme MenuRAM -configuration Debug -destination 'platform=macOS,arch=arm64' build
-open ~/Library/Developer/Xcode/DerivedData/MenuRAM-*/Build/Products/Debug/MenuRAM.app
-```
 
 ## Later (not MVP)
 
