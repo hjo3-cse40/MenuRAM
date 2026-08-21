@@ -11,6 +11,7 @@
 		A10000000000000000000002 /* MemoryMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000012 /* MemoryMonitor.swift */; };
 		A10000000000000000000003 /* MemoryBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000013 /* MemoryBarView.swift */; };
 		A10000000000000000000004 /* ProcessMemory.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000014 /* ProcessMemory.swift */; };
+		A10000000000000000000005 /* HoverTooltip.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000015 /* HoverTooltip.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -19,6 +20,7 @@
 		A10000000000000000000012 /* MemoryMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoryMonitor.swift; sourceTree = "<group>"; };
 		A10000000000000000000013 /* MemoryBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoryBarView.swift; sourceTree = "<group>"; };
 		A10000000000000000000014 /* ProcessMemory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessMemory.swift; sourceTree = "<group>"; };
+		A10000000000000000000015 /* HoverTooltip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HoverTooltip.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -47,6 +49,7 @@
 				A10000000000000000000012 /* MemoryMonitor.swift */,
 				A10000000000000000000013 /* MemoryBarView.swift */,
 				A10000000000000000000014 /* ProcessMemory.swift */,
+				A10000000000000000000015 /* HoverTooltip.swift */,
 			);
 			path = MenuRAM;
 			sourceTree = "<group>";
@@ -126,6 +129,7 @@
 				A10000000000000000000002 /* MemoryMonitor.swift in Sources */,
 				A10000000000000000000003 /* MemoryBarView.swift in Sources */,
 				A10000000000000000000004 /* ProcessMemory.swift in Sources */,
+				A10000000000000000000005 /* HoverTooltip.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

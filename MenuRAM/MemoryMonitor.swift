@@ -12,6 +12,7 @@ final class MemoryMonitor: ObservableObject {
     @Published private(set) var wiredBytes: UInt64 = 0
     @Published private(set) var compressedBytes: UInt64 = 0
     @Published private(set) var availableBytes: UInt64 = 0
+    @Published private(set) var swapUsedBytes: UInt64 = 0
     @Published private(set) var pressure: MemoryPressureLevel = .normal
     @Published private(set) var topProcesses: [ProcessMemoryInfo] = []
 
@@ -23,7 +24,8 @@ final class MemoryMonitor: ObservableObject {
         "\(MemoryFormat.gb(usedBytes)) / \(MemoryFormat.gb(totalBytes)) GB"
     }
 
-    var availableText: String { "Available: \(MemoryFormat.gb(availableBytes)) GB" }
+    var availableText: String { "Available: \(MemoryFormat.bytes(availableBytes))" }
+    var swapText: String { "Swap: \(MemoryFormat.bytes(swapUsedBytes))" }
     var pressureText: String { "Pressure: \(pressure.rawValue)" }
 
     init() {
@@ -101,6 +103,7 @@ final class MemoryMonitor: ObservableObject {
         availableBytes = available
         usedBytes = app + wired + compressed
         totalBytes = ProcessInfo.processInfo.physicalMemory
+        swapUsedBytes = Self.readSwapUsedBytes() ?? swapUsedBytes
 
         // Keep pressure in sync when sysctl is readable; DispatchSource covers transitions.
         if let level = Self.readPressureLevel() {
@@ -139,7 +142,7 @@ final class MemoryMonitor: ObservableObject {
     }
 
     /// Reads `kern.memorystatus_vm_pressure_level` when permitted.
-    /// 0 = normal, 1 = warning, 2+ = critical.
+    /// 0 = normal, 1 = warning, 2+ = critical/urgent (kernel pressure).
     private static func readPressureLevel() -> MemoryPressureLevel? {
         var level: Int32 = 0
         var size = MemoryLayout<Int32>.size
@@ -154,5 +157,13 @@ final class MemoryMonitor: ObservableObject {
         default:
             return .critical
         }
+    }
+
+    private static func readSwapUsedBytes() -> UInt64? {
+        var usage = xsw_usage()
+        var size = MemoryLayout<xsw_usage>.size
+        let result = sysctlbyname("vm.swapusage", &usage, &size, nil, 0)
+        guard result == 0 else { return nil }
+        return usage.xsu_used
     }
 }

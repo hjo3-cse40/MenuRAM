@@ -13,8 +13,10 @@ Native macOS menu bar app. Shows live RAM use.
 
 - Available (free + reclaimable)
 - Pressure: Normal / Warning / Critical
+- Swap used
 - Color breakdown bar (App / Wired / Compressed / Other)
-- Top 5 apps by RAM
+- Top 5 apps by RAM (helpers grouped)
+- Hover tooltips for short explanations
 - Quit
 
 ## Tech

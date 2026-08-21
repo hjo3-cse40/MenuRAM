@@ -17,6 +17,17 @@ enum MemoryPressureLevel: String, Equatable {
         }
     }
 
+    var helpText: String {
+        switch self {
+        case .normal:
+            return "macOS has enough free memory. Fine to open more apps or load models."
+        case .warning:
+            return "Memory is getting tight. macOS may compress or reclaim caches soon."
+        case .critical:
+            return "macOS is under memory pressure. Expect hitches; large new loads may struggle."
+        }
+    }
+
     /// Concrete colors for menu bar rendering (SF Symbols are forced to template/monochrome there).
     var nsColor: NSColor {
         switch self {
@@ -47,6 +58,7 @@ struct MemoryBarView: View {
     let wiredBytes: UInt64
     let compressedBytes: UInt64
     let totalBytes: UInt64
+    @Binding var hoverInfo: HoverInfo?
 
     private var otherBytes: UInt64 {
         let used = appBytes + wiredBytes + compressedBytes
@@ -66,12 +78,36 @@ struct MemoryBarView: View {
             }
             .frame(height: 10)
             .clipShape(RoundedRectangle(cornerRadius: 3, style: .continuous))
+            .hoverTooltip(
+                $hoverInfo,
+                text: "Share of physical RAM by category. Other is leftover (cache/free-ish)."
+            )
 
             VStack(alignment: .leading, spacing: 3) {
-                legendRow(color: Color(red: 0.25, green: 0.55, blue: 0.95), title: "App", bytes: appBytes)
-                legendRow(color: Color(red: 0.70, green: 0.40, blue: 0.85), title: "Wired", bytes: wiredBytes)
-                legendRow(color: Color(red: 0.95, green: 0.55, blue: 0.20), title: "Compressed", bytes: compressedBytes)
-                legendRow(color: Color.primary.opacity(0.35), title: "Other", bytes: otherBytes)
+                legendRow(
+                    color: Color(red: 0.25, green: 0.55, blue: 0.95),
+                    title: "App",
+                    bytes: appBytes,
+                    help: "Memory held by apps (anonymous/internal pages)."
+                )
+                legendRow(
+                    color: Color(red: 0.70, green: 0.40, blue: 0.85),
+                    title: "Wired",
+                    bytes: wiredBytes,
+                    help: "Locked system memory that usually cannot be paged out."
+                )
+                legendRow(
+                    color: Color(red: 0.95, green: 0.55, blue: 0.20),
+                    title: "Compressed",
+                    bytes: compressedBytes,
+                    help: "Idle pages squeezed in RAM. Better than swap, still a stress signal."
+                )
+                legendRow(
+                    color: Color.primary.opacity(0.35),
+                    title: "Other",
+                    bytes: otherBytes,
+                    help: "Remaining RAM not counted in App, Wired, or Compressed."
+                )
             }
             .font(.caption)
         }
@@ -88,17 +124,18 @@ struct MemoryBarView: View {
         }
     }
 
-    private func legendRow(color: Color, title: String, bytes: UInt64) -> some View {
+    private func legendRow(color: Color, title: String, bytes: UInt64, help: String) -> some View {
         HStack(spacing: 6) {
             Circle()
                 .fill(color)
                 .frame(width: 7, height: 7)
             Text(title)
             Spacer(minLength: 8)
-            Text(MemoryFormat.gb(bytes) + " GB")
+            Text(MemoryFormat.bytes(bytes))
                 .foregroundStyle(.secondary)
                 .monospacedDigit()
         }
+        .hoverTooltip($hoverInfo, text: help)
     }
 }
 
@@ -106,5 +143,15 @@ enum MemoryFormat {
     static func gb(_ bytes: UInt64) -> String {
         let value = Double(bytes) / 1_073_741_824.0
         return String(format: "%.1f", value)
+    }
+
+    /// Show MB under 0.1 GB so small values stay readable.
+    static func bytes(_ bytes: UInt64) -> String {
+        let gb = Double(bytes) / 1_073_741_824.0
+        if gb < 0.1 {
+            let mb = Double(bytes) / 1_048_576.0
+            return String(format: "%.0f MB", mb)
+        }
+        return String(format: "%.1f GB", gb)
     }
 }

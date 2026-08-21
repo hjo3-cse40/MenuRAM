@@ -2,14 +2,13 @@ import Darwin
 import Foundation
 
 struct ProcessMemoryInfo: Identifiable, Equatable {
-    var id: Int32 { pid }
-    let pid: Int32
+    let id: String
     let name: String
     let bytes: UInt64
 }
 
 enum ProcessMemoryProvider {
-    /// Returns the top processes by physical memory footprint (Activity Monitor–style).
+    /// Returns the top apps by physical footprint, with Helper processes grouped.
     static func topProcesses(limit: Int = 5) -> [ProcessMemoryInfo] {
         // On current macOS, proc_listallpids(nil, 0) returns a PID *count*, not a byte count.
         let estimatedCount = proc_listallpids(nil, 0)
@@ -19,22 +18,25 @@ enum ProcessMemoryProvider {
         let bufferBytes = Int32(pids.count * MemoryLayout<pid_t>.stride)
         _ = proc_listallpids(&pids, bufferBytes)
 
-        var results: [ProcessMemoryInfo] = []
-        results.reserveCapacity(min(limit * 8, pids.count))
+        var totals: [String: UInt64] = [:]
 
         for pid in pids {
             guard pid > 0 else { continue }
             guard let bytes = memoryBytes(for: pid), bytes > 0 else { continue }
-            let name = processName(for: pid)
-            guard !name.isEmpty else { continue }
-            results.append(ProcessMemoryInfo(pid: pid, name: name, bytes: bytes))
+            let rawName = processName(for: pid)
+            guard !rawName.isEmpty else { continue }
+            let name = displayName(for: rawName)
+            totals[name, default: 0] += bytes
         }
 
-        results.sort { $0.bytes > $1.bytes }
-        if results.count > limit {
-            return Array(results.prefix(limit))
+        let ranked = totals
+            .map { ProcessMemoryInfo(id: $0.key, name: $0.key, bytes: $0.value) }
+            .sorted { $0.bytes > $1.bytes }
+
+        if ranked.count > limit {
+            return Array(ranked.prefix(limit))
         }
-        return results
+        return ranked
     }
 
     /// Prefer phys_footprint (matches Activity Monitor “Memory”); fall back to RSS.
@@ -69,5 +71,24 @@ enum ProcessMemoryProvider {
         guard pathLength > 0 else { return "" }
         let path = String(cString: pathBuffer)
         return (path as NSString).lastPathComponent
+    }
+
+    /// Collapse Electron/browser helpers into a parent-style label.
+    private static func displayName(for rawName: String) -> String {
+        if rawName.hasPrefix("com.apple.WebKit") {
+            return "WebKit"
+        }
+
+        let suffixes = [
+            " Helper (Renderer)",
+            " Helper (Plugin)",
+            " Helper (GPU)",
+            " Helper",
+        ]
+        for suffix in suffixes where rawName.hasSuffix(suffix) {
+            let base = String(rawName.dropLast(suffix.count))
+            return base.isEmpty ? rawName : base
+        }
+        return rawName
     }
 }
