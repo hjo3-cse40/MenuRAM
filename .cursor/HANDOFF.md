@@ -34,7 +34,7 @@ Native **menu-bar-only** SwiftUI app (`LSUIElement`). Popover via `MenuBarExtra`
 - Available = free + speculative + inactive + purgeable.
 - Pressure: `kern.memorystatus_vm_pressure_level` + `DispatchSourceMemoryPressure`. Critical on this 18 GB machine under Cursor/browsers is **often real**, not a bug. User accepted that. Pair with Swap.
 - Swap: `vm.swapusage` / `xsu_used`.
-- Top apps: `proc_listallpids(nil,0)` returns a **PID count, not bytes**. Rank `ri_phys_footprint`. Group `Helper (Renderer|Plugin|GPU)` and `com.apple.WebKit*` → WebKit.
+- Top apps: `proc_listallpids(nil,0)` returns a **PID count, not bytes**. Rank `ri_phys_footprint`. Group `Helper (Renderer|Plugin|GPU)`. Group `com.apple.WebKit*` into the responsible app (Safari/Mail) via `responsibility_get_pid_responsible_for_pid`; fallback label is still WebKit.
 - Files: `MenuRAM/App.swift`, `MemoryMonitor.swift`, `MemoryBarView.swift`, `ProcessMemory.swift`, `HoverTooltip.swift`.
 - Scheme: `MenuRAM`. Ad-hoc sign to run locally. DerivedData gitignored; local `.derivedData` in repo is junk.
 

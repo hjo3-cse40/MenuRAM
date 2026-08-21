@@ -7,6 +7,10 @@ struct ProcessMemoryInfo: Identifiable, Equatable {
     let bytes: UInt64
 }
 
+/// macOS responsibility API: which app owns an XPC helper (e.g. WebKit → Safari).
+@_silgen_name("responsibility_get_pid_responsible_for_pid")
+private func responsibility_get_pid_responsible_for_pid(_ pid: pid_t) -> pid_t
+
 enum ProcessMemoryProvider {
     /// Returns the top apps by physical footprint, with Helper processes grouped.
     static func topProcesses(limit: Int = 5) -> [ProcessMemoryInfo] {
@@ -19,13 +23,14 @@ enum ProcessMemoryProvider {
         _ = proc_listallpids(&pids, bufferBytes)
 
         var totals: [String: UInt64] = [:]
+        var nameByPid: [pid_t: String] = [:]
 
         for pid in pids {
             guard pid > 0 else { continue }
             guard let bytes = memoryBytes(for: pid), bytes > 0 else { continue }
-            let rawName = processName(for: pid)
+            let rawName = cachedProcessName(pid: pid, cache: &nameByPid)
             guard !rawName.isEmpty else { continue }
-            let name = displayName(for: rawName)
+            let name = groupingName(for: pid, rawName: rawName, nameByPid: &nameByPid)
             totals[name, default: 0] += bytes
         }
 
@@ -73,12 +78,38 @@ enum ProcessMemoryProvider {
         return (path as NSString).lastPathComponent
     }
 
-    /// Collapse Electron/browser helpers into a parent-style label.
-    private static func displayName(for rawName: String) -> String {
+    /// Fold helpers into the app you would actually quit.
+    /// WebKit XPCs have no parent in their process name, so we use the responsible PID.
+    private static func groupingName(
+        for pid: pid_t,
+        rawName: String,
+        nameByPid: inout [pid_t: String]
+    ) -> String {
         if rawName.hasPrefix("com.apple.WebKit") {
+            let ownerPid = responsibility_get_pid_responsible_for_pid(pid)
+            if ownerPid > 1, ownerPid != pid {
+                let ownerRaw = cachedProcessName(pid: ownerPid, cache: &nameByPid)
+                if !ownerRaw.isEmpty {
+                    return displayName(for: ownerRaw)
+                }
+            }
             return "WebKit"
         }
 
+        return displayName(for: rawName)
+    }
+
+    private static func cachedProcessName(pid: pid_t, cache: inout [pid_t: String]) -> String {
+        if let cached = cache[pid] {
+            return cached
+        }
+        let name = processName(for: pid)
+        cache[pid] = name
+        return name
+    }
+
+    /// Collapse Electron/browser helpers into a parent-style label.
+    private static func displayName(for rawName: String) -> String {
         let suffixes = [
             " Helper (Renderer)",
             " Helper (Plugin)",

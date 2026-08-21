@@ -25,7 +25,7 @@ Native macOS menu bar app for live RAM, pressure, and swap.
 - **Pressure:** Normal / Warning / Critical (same family of signal as Activity Monitor)
 - **Swap:** pages on disk (thrash signal)
 - **Breakdown:** App, Wired, Compressed, Other
-- **Top 5 apps:** ranked by footprint; helpers grouped (e.g. Cursor Helper → Cursor)
+- **Top 5 apps:** ranked by footprint; helpers grouped (Cursor Helper → Cursor, WebKit → Safari/Mail/etc.)
 - Hover Available, Pressure, Swap, or the bar for a short explanation
 
 Built with SwiftUI `MenuBarExtra` and Darwin `host_statistics64`.
@@ -55,7 +55,7 @@ There is no App Store build yet. This is source + Xcode.
 | Total | Physical RAM |
 | App | Internal / anonymous pages |
 | Available | Free + speculative + inactive + purgeable |
-| Top Apps | Per-process `phys_footprint`, helpers folded into the parent name |
+| Top Apps | Per-process `phys_footprint`, helpers folded into the parent name (including WebKit into Safari) |
 
 Top Apps will not sum to App Memory. Different accounting (grouped processes vs VM buckets). That is expected.
 
