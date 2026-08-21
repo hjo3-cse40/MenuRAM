@@ -1,57 +1,58 @@
 # MenuRAM
 
-Native macOS menu bar app. Shows live RAM use.
+Native macOS menu bar app for live RAM, pressure, and swap.
+
+<p align="center">
+  <img src="docs/menuram-hero.png" alt="MenuRAM in the menu bar with a popover showing available memory, pressure, swap, a color breakdown, and top apps" width="420">
+</p>
+
+<p align="center">
+  <em>Always-on used / total in the menu bar. Click for the rest. No Dock icon.</em>
+</p>
 
 ## Features
 
-**Menu bar**
+- **Menu bar:** pressure color + `Used / Total GB`
+- **Available:** free + reclaimable memory
+- **Pressure:** Normal / Warning / Critical (same family of signal as Activity Monitor)
+- **Swap:** pages on disk (thrash signal)
+- **Breakdown:** App, Wired, Compressed, Other
+- **Top 5 apps:** ranked by footprint; helpers grouped (e.g. Cursor Helper → Cursor)
+- Hover Available, Pressure, Swap, or the bar for a short explanation
 
-- Colored pressure dot + `Used / Total GB`
-- No Dock icon (`LSUIElement`)
-
-**Popover (click the menu bar item)**
-
-- Available (free + reclaimable)
-- Pressure: Normal / Warning / Critical
-- Swap used
-- Color breakdown bar (App / Wired / Compressed / Other)
-- Top 5 apps by RAM (helpers grouped)
-- Hover tooltips for short explanations
-- Quit
-
-## Tech
-
-- SwiftUI `MenuBarExtra` (`.window` style)
-- `ObservableObject` `MemoryMonitor`
-- Darwin: `host_statistics64` / `HOST_VM_INFO64`
-- Memory pressure via sysctl + `DispatchSource`
-- Top processes via `libproc`
-- Host stats every 2 seconds; top apps about every 4 seconds
-
-## Files
-
-- `MenuRAM/App.swift` — menu bar + popover UI
-- `MenuRAM/MemoryMonitor.swift` — RAM + pressure
-- `MenuRAM/MemoryBarView.swift` — color bar
-- `MenuRAM/ProcessMemory.swift` — top processes
-- `MenuRAM.xcodeproj` — Xcode project
+Built with SwiftUI `MenuBarExtra` and Darwin `host_statistics64`.
 
 ## Requirements
 
-- macOS 14+
-- Xcode 16.4+
+- macOS 14 or later
+- Xcode 16.4 or later
 
-## Build and run
+## Run
 
-**In Xcode**
+```bash
+git clone https://github.com/hjo3-cse40/MenuRAM.git
+cd MenuRAM
+open MenuRAM.xcodeproj
+```
 
-1. Open Existing Project
-2. Pick `MenuRAM.xcodeproj`
-3. Destination: My Mac
-4. Press Run (▶)
-5. Click the menu bar item to open the popover
-6. Use Quit to stop
+In Xcode: destination **My Mac** → Run. Click the menu bar item. Quit from the popover.
 
-## Status
+There is no App Store build yet. This is source + Xcode.
 
-Popover overview with pressure, color bar, and top 5 apps.
+## How numbers work
+
+| Field | Meaning |
+|--------|---------|
+| Used | App + Wired + Compressed |
+| Total | Physical RAM |
+| App | Internal / anonymous pages |
+| Available | Free + speculative + inactive + purgeable |
+| Top Apps | Per-process `phys_footprint`, helpers folded into the parent name |
+
+Top Apps will not sum to App Memory. Different accounting (grouped processes vs VM buckets). That is expected.
+
+Stats refresh about every 2 seconds. Top apps refresh about every 4 seconds.
+
+## License
+
+Source in this repo. No packaged download or notarized app yet.
