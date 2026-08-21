@@ -63,4 +63,6 @@ Stats refresh about every 2 seconds. Top apps refresh about every 4 seconds.
 
 ## License
 
-Source in this repo. No packaged download or notarized app yet.
+MIT. See `LICENSE`.
+
+There is no packaged download or notarized app yet. This is source + Xcode.
