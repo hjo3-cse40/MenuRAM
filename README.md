@@ -1,4 +1,4 @@
-# MenuRAM
+# <img src="docs/menuram-icon.png" width="48" height="48" alt=""> MenuRAM
 
 Native macOS menu bar app for live RAM, pressure, and swap.
 
