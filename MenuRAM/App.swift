@@ -1,10 +1,13 @@
 import AppKit
+import ServiceManagement
 import SwiftUI
 
 @main
 struct MenuRAMApp: App {
     @StateObject private var monitor = MemoryMonitor()
     @State private var hoverInfo: HoverInfo?
+    @State private var launchAtLogin = false
+    @State private var loginNeedsApproval = false
 
     var body: some Scene {
         MenuBarExtra {
@@ -87,11 +90,47 @@ struct MenuRAMApp: App {
 
             Divider()
 
+            Toggle("Launch at Login", isOn: launchAtLoginBinding)
+
+            if loginNeedsApproval {
+                Button("Allow in Login Items…") {
+                    SMAppService.openSystemSettingsLoginItems()
+                }
+                .font(.caption)
+            }
+
             Button("Quit") {
                 NSApplication.shared.terminate(nil)
             }
             .keyboardShortcut("q")
         }
+        .onAppear(perform: refreshLoginItemState)
+    }
+
+    private var launchAtLoginBinding: Binding<Bool> {
+        Binding(
+            get: { launchAtLogin },
+            set: { setLaunchAtLogin($0) }
+        )
+    }
+
+    private func refreshLoginItemState() {
+        let status = SMAppService.mainApp.status
+        launchAtLogin = status == .enabled
+        loginNeedsApproval = status == .requiresApproval
+    }
+
+    private func setLaunchAtLogin(_ enabled: Bool) {
+        do {
+            if enabled {
+                try SMAppService.mainApp.register()
+            } else if SMAppService.mainApp.status != .notRegistered {
+                try SMAppService.mainApp.unregister()
+            }
+        } catch {
+            // Refresh below snaps the toggle back if macOS rejected the change.
+        }
+        refreshLoginItemState()
     }
 }
 
