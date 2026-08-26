@@ -35,17 +35,31 @@ Built with SwiftUI `MenuBarExtra` and Darwin `host_statistics64`.
 - macOS 14 or later
 - Xcode 16.4 or later
 
-## Run
+## Install (Release `.app`)
+
+Xcode **Run** is Debug plus the debugger. That copy is for development and uses a lot of extra RAM. For daily use, install a **Release** app and quit the Xcode instance.
 
 ```bash
 git clone https://github.com/hjo3-cse40/MenuRAM.git
 cd MenuRAM
+chmod +x scripts/install-local.sh
+./scripts/install-local.sh
+```
+
+That builds Release, copies `MenuRAM.app` to `~/Applications`, and opens it. Pass `/Applications` if you want it there (may need admin). Then:
+
+1. Quit MenuRAM if it is still running from Xcode (`killall MenuRAM`, then open the installed app).
+2. Click the menu extra → **Launch at Login** so login uses this bundle, not DerivedData.
+
+Rebuild the same way after source changes. There is no packaged GitHub download yet.
+
+## Develop in Xcode
+
+```bash
 open MenuRAM.xcodeproj
 ```
 
-In Xcode: destination **My Mac** → Run. Click the menu bar item. Quit from the popover.
-
-There is no App Store build yet. This is source + Xcode.
+Destination **My Mac** → Run. Quit from the popover when you are done debugging.
 
 ## How numbers work
 
@@ -65,4 +79,4 @@ Stats refresh about every 2 seconds. Top apps refresh about every 4 seconds.
 
 MIT. See `LICENSE`.
 
-There is no packaged download or notarized app yet. This is source + Xcode.
+There is no packaged GitHub download or notarized app yet. Local install still needs Xcode to compile.

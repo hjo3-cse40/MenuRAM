@@ -1,0 +1,24 @@
+---
+description: MenuRAM product facts, Top Apps grouping, and locked decisions
+alwaysApply: true
+---
+
+# MenuRAM
+
+Native macOS menu-bar RAM monitor (`LSUIElement`). GitHub: `hjo3-cse40/MenuRAM`. Local: `/Users/samjo/GITHUB_REPO/menuram`.
+
+## Top Apps (locked)
+
+Rank `ri_phys_footprint`. Fold `Helper (Renderer|Plugin|GPU)` into the parent name.
+
+Fold `com.apple.WebKit*` into the **responsible app** (Safari, Mail, Notes, etc.) via `responsibility_get_pid_responsible_for_pid`. Fallback label is `WebKit` only if that lookup fails.
+
+Goal: the row is the app Sam would quit. Do not show a generic WebKit bucket when Safari (or Mail) owns those processes. `proc_name` for WebKit XPCs has no parent; RSS undercounts vs footprint.
+
+## Stats (locked)
+
+App Memory = `internal_page_count` only. Used = App + Wired + Compressed. Available = free + speculative + inactive + purgeable. Pressure + swap are real on an 18 GB machine under Cursor/Safari.
+
+## Product
+
+Stay simple. No kill button in Top Apps. Hover cards on Available / Pressure / Swap / bar, not on Top Apps. No App Store/notarization today. Daily use is a **Release `.app`** via `scripts/install-local.sh`, not Xcode Run. Later distribute as a Homebrew **cask** of `MenuRAM.app` (cask file in this repo, not a second tap unless we want it). Launchpad is incidental. Commit/push only when asked. Author: `hjo3-cse40 <hjo3@ucsc.edu>`.
