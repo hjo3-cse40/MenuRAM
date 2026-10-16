@@ -5,6 +5,8 @@ import SwiftUI
 @main
 struct MenuRAMApp: App {
     @StateObject private var monitor = MemoryMonitor()
+    @StateObject private var llm = LLMModeModel()
+    @AppStorage("panelMode") private var mode: PanelMode = .standard
     @State private var hoverInfo: HoverInfo?
     @State private var launchAtLogin = false
     @State private var loginNeedsApproval = false
@@ -13,7 +15,7 @@ struct MenuRAMApp: App {
         MenuBarExtra {
             panel
                 .padding(12)
-                .frame(width: 280)
+                .frame(width: mode == .llm ? 340 : 280)
                 .overlay {
                     GeometryReader { proxy in
                         HoverTooltipOverlay(info: hoverInfo, panelSize: proxy.size)
@@ -24,13 +26,80 @@ struct MenuRAMApp: App {
             // Menu bar forces SF Symbols to template (monochrome). Use a bitmap dot instead.
             HStack(spacing: 5) {
                 Image(nsImage: monitor.pressure.menuBarDotImage())
-                Text(monitor.menuBarTitle)
+                Text(menuBarTitle)
             }
         }
         .menuBarExtraStyle(.window)
     }
 
+    private var menuBarTitle: String {
+        guard let suffix = llm.menuBarSuffix else { return monitor.menuBarTitle }
+        return "\(monitor.menuBarTitle) · \(suffix)"
+    }
+
     private var panel: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            header
+
+            switch mode {
+            case .standard:
+                standardContent
+            case .llm:
+                LLMDashboardView(model: llm, layout: .compact, hoverInfo: $hoverInfo)
+                Toggle("Show LLM status in menu bar", isOn: $llm.showsMenuBarStatus)
+            }
+
+            Divider()
+
+            Toggle("Launch at Login", isOn: launchAtLoginBinding)
+
+            if loginNeedsApproval {
+                Button("Allow in Login Items…") {
+                    SMAppService.openSystemSettingsLoginItems()
+                }
+                .font(.caption)
+            }
+
+            Button("Quit") {
+                NSApplication.shared.terminate(nil)
+            }
+            .keyboardShortcut("q")
+        }
+        .onAppear {
+            refreshLoginItemState()
+            llm.setSurface(.popover, active: mode == .llm)
+        }
+        .onDisappear {
+            llm.setSurface(.popover, active: false)
+        }
+        .onChange(of: mode) { _, newMode in
+            hoverInfo = nil
+            llm.setSurface(.popover, active: newMode == .llm)
+        }
+    }
+
+    private var header: some View {
+        HStack(spacing: 8) {
+            Picker("Mode", selection: $mode) {
+                Text("Standard").tag(PanelMode.standard)
+                Text("LLM Mode").tag(PanelMode.llm)
+            }
+            .pickerStyle(.segmented)
+            .labelsHidden()
+            .controlSize(.small)
+
+            Button {
+                FloatingLLMPanelController.shared.show(model: llm)
+            } label: {
+                Image(systemName: "macwindow.on.rectangle")
+            }
+            .buttonStyle(.borderless)
+            .help("Pop out LLM dashboard")
+        }
+    }
+
+    @ViewBuilder
+    private var standardContent: some View {
         VStack(alignment: .leading, spacing: 10) {
             VStack(alignment: .leading, spacing: 4) {
                 Text(monitor.availableText)
@@ -87,24 +156,7 @@ struct MenuRAMApp: App {
                         }
                     }
             }
-
-            Divider()
-
-            Toggle("Launch at Login", isOn: launchAtLoginBinding)
-
-            if loginNeedsApproval {
-                Button("Allow in Login Items…") {
-                    SMAppService.openSystemSettingsLoginItems()
-                }
-                .font(.caption)
-            }
-
-            Button("Quit") {
-                NSApplication.shared.terminate(nil)
-            }
-            .keyboardShortcut("q")
         }
-        .onAppear(perform: refreshLoginItemState)
     }
 
     private var launchAtLoginBinding: Binding<Bool> {
@@ -132,6 +184,11 @@ struct MenuRAMApp: App {
         }
         refreshLoginItemState()
     }
+}
+
+private enum PanelMode: String {
+    case standard
+    case llm
 }
 
 private enum HoverHint {

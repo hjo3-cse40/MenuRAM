@@ -7,6 +7,16 @@ struct ProcessMemoryInfo: Identifiable, Equatable {
     let bytes: UInt64
 }
 
+/// One scanned process, already folded into the app you would quit.
+struct ProcessSample {
+    let pid: pid_t
+    let rawName: String
+    let groupName: String
+    /// App that owns this process (Safari for WebKit XPCs, the Electron main process for helpers).
+    let ownerPid: pid_t
+    let bytes: UInt64
+}
+
 /// macOS responsibility API: which app owns an XPC helper (e.g. WebKit → Safari).
 @_silgen_name("responsibility_get_pid_responsible_for_pid")
 private func responsibility_get_pid_responsible_for_pid(_ pid: pid_t) -> pid_t
@@ -14,24 +24,9 @@ private func responsibility_get_pid_responsible_for_pid(_ pid: pid_t) -> pid_t
 enum ProcessMemoryProvider {
     /// Returns the top apps by physical footprint, with Helper processes grouped.
     static func topProcesses(limit: Int = 5) -> [ProcessMemoryInfo] {
-        // On current macOS, proc_listallpids(nil, 0) returns a PID *count*, not a byte count.
-        let estimatedCount = proc_listallpids(nil, 0)
-        guard estimatedCount > 0 else { return [] }
-
-        var pids = [pid_t](repeating: 0, count: Int(estimatedCount) + 64)
-        let bufferBytes = Int32(pids.count * MemoryLayout<pid_t>.stride)
-        _ = proc_listallpids(&pids, bufferBytes)
-
         var totals: [String: UInt64] = [:]
-        var nameByPid: [pid_t: String] = [:]
-
-        for pid in pids {
-            guard pid > 0 else { continue }
-            guard let bytes = memoryBytes(for: pid), bytes > 0 else { continue }
-            let rawName = cachedProcessName(pid: pid, cache: &nameByPid)
-            guard !rawName.isEmpty else { continue }
-            let name = groupingName(for: pid, rawName: rawName, nameByPid: &nameByPid)
-            totals[name, default: 0] += bytes
+        for sample in samples() {
+            totals[sample.groupName, default: 0] += sample.bytes
         }
 
         let ranked = totals
@@ -44,8 +39,34 @@ enum ProcessMemoryProvider {
         return ranked
     }
 
+    /// Every readable process with its footprint and owning app.
+    static func samples() -> [ProcessSample] {
+        // On current macOS, proc_listallpids(nil, 0) returns a PID *count*, not a byte count.
+        let estimatedCount = proc_listallpids(nil, 0)
+        guard estimatedCount > 0 else { return [] }
+
+        var pids = [pid_t](repeating: 0, count: Int(estimatedCount) + 64)
+        let bufferBytes = Int32(pids.count * MemoryLayout<pid_t>.stride)
+        _ = proc_listallpids(&pids, bufferBytes)
+
+        var nameByPid: [pid_t: String] = [:]
+        var result: [ProcessSample] = []
+
+        for pid in pids {
+            guard pid > 0 else { continue }
+            guard let bytes = memoryBytes(for: pid), bytes > 0 else { continue }
+            let rawName = cachedProcessName(pid: pid, cache: &nameByPid)
+            guard !rawName.isEmpty else { continue }
+            let (groupName, ownerPid) = grouping(for: pid, rawName: rawName, nameByPid: &nameByPid)
+            result.append(
+                ProcessSample(pid: pid, rawName: rawName, groupName: groupName, ownerPid: ownerPid, bytes: bytes)
+            )
+        }
+        return result
+    }
+
     /// Prefer phys_footprint (matches Activity Monitor “Memory”); fall back to RSS.
-    private static func memoryBytes(for pid: pid_t) -> UInt64? {
+    static func memoryBytes(for pid: pid_t) -> UInt64? {
         var rusage = rusage_info_v2()
         let rusageResult = withUnsafeMutablePointer(to: &rusage) { pointer -> Int32 in
             pointer.withMemoryRebound(to: rusage_info_t?.self, capacity: 1) { rebound in
@@ -55,7 +76,11 @@ enum ProcessMemoryProvider {
         if rusageResult == 0, rusage.ri_phys_footprint > 0 {
             return rusage.ri_phys_footprint
         }
+        return residentBytes(for: pid)
+    }
 
+    /// RSS. Unlike footprint, this includes mmapped model weights.
+    static func residentBytes(for pid: pid_t) -> UInt64? {
         var taskInfo = proc_taskinfo()
         let size = Int32(MemoryLayout<proc_taskinfo>.size)
         let result = proc_pidinfo(pid, PROC_PIDTASKINFO, 0, &taskInfo, size)
@@ -63,7 +88,7 @@ enum ProcessMemoryProvider {
         return UInt64(taskInfo.pti_resident_size)
     }
 
-    private static func processName(for pid: pid_t) -> String {
+    static func processName(for pid: pid_t) -> String {
         var nameBuffer = [CChar](repeating: 0, count: 1024)
         let nameLength = proc_name(pid, &nameBuffer, UInt32(nameBuffer.count))
         if nameLength > 0 {
@@ -80,23 +105,25 @@ enum ProcessMemoryProvider {
 
     /// Fold helpers into the app you would actually quit.
     /// WebKit XPCs have no parent in their process name, so we use the responsible PID.
-    private static func groupingName(
+    private static func grouping(
         for pid: pid_t,
         rawName: String,
         nameByPid: inout [pid_t: String]
-    ) -> String {
+    ) -> (name: String, ownerPid: pid_t) {
+        let responsible = responsibility_get_pid_responsible_for_pid(pid)
+        let ownerPid = responsible > 1 ? responsible : pid
+
         if rawName.hasPrefix("com.apple.WebKit") {
-            let ownerPid = responsibility_get_pid_responsible_for_pid(pid)
-            if ownerPid > 1, ownerPid != pid {
+            if ownerPid != pid {
                 let ownerRaw = cachedProcessName(pid: ownerPid, cache: &nameByPid)
                 if !ownerRaw.isEmpty {
-                    return displayName(for: ownerRaw)
+                    return (displayName(for: ownerRaw), ownerPid)
                 }
             }
-            return "WebKit"
+            return ("WebKit", ownerPid)
         }
 
-        return displayName(for: rawName)
+        return (displayName(for: rawName), ownerPid)
     }
 
     private static func cachedProcessName(pid: pid_t, cache: inout [pid_t: String]) -> String {
