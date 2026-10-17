@@ -37,7 +37,7 @@ final class ProcessFreezer: ObservableObject {
     private static let defaultsKey = "LLMMode.frozenProcesses"
     private static let neverFreeze: Set<String> = [
         "WindowServer", "kernel_task", "launchd", "loginwindow", "Dock", "Finder",
-        "SystemUIServer", "ControlCenter", "MenuRAM", "LM Studio", "Ollama",
+        "SystemUIServer", "ControlCenter", "Control Center", "MenuRAM", "LM Studio", "Ollama",
     ]
     private static let rendererNames: [String] = ["com.apple.WebKit.WebContent"]
     private static let rendererSuffixes: [String] = [" Helper (Renderer)"]

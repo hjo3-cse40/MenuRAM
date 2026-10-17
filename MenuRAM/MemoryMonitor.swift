@@ -14,7 +14,7 @@ final class MemoryMonitor: ObservableObject {
     @Published private(set) var availableBytes: UInt64 = 0
     @Published private(set) var swapUsedBytes: UInt64 = 0
     @Published private(set) var pressure: MemoryPressureLevel = .normal
-    @Published private(set) var topProcesses: [ProcessMemoryInfo] = []
+    @Published private(set) var processSnapshot = ProcessMemorySnapshot()
 
     private var timer: Timer?
     private var pressureSource: DispatchSourceMemoryPressure?
@@ -56,7 +56,7 @@ final class MemoryMonitor: ObservableObject {
         refreshHostStats()
         // Process scan is heavier; refresh about every 4 seconds.
         if refreshProcessesOnNextTick {
-            refreshTopProcesses()
+            refreshProcesses()
         }
         refreshProcessesOnNextTick.toggle()
     }
@@ -111,8 +111,8 @@ final class MemoryMonitor: ObservableObject {
         }
     }
 
-    private func refreshTopProcesses() {
-        topProcesses = ProcessMemoryProvider.topProcesses(limit: 5)
+    private func refreshProcesses() {
+        processSnapshot = ProcessMemoryProvider.snapshot()
     }
 
     private func startPressureMonitor() {

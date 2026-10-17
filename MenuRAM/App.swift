@@ -132,30 +132,10 @@ struct MenuRAMApp: App {
 
             Divider()
 
-            VStack(alignment: .leading, spacing: 4) {
-                Text("Top Apps")
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(.secondary)
-
-                    if monitor.topProcesses.isEmpty {
-                        Text("Scanning…")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    } else {
-                        ForEach(monitor.topProcesses) { process in
-                            HStack {
-                                Text(process.name)
-                                    .lineLimit(1)
-                                    .truncationMode(.middle)
-                                Spacer(minLength: 8)
-                                Text(MemoryFormat.bytes(process.bytes))
-                                    .foregroundStyle(.secondary)
-                                    .monospacedDigit()
-                            }
-                            .font(.caption)
-                        }
-                    }
-            }
+            AppBreakdownView(
+                snapshot: monitor.processSnapshot,
+                wiredBytes: monitor.wiredBytes
+            )
         }
     }
 

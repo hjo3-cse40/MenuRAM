@@ -25,6 +25,8 @@
 		B1000000000000000000000A /* ContextSimulatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2000000000000000000000A /* ContextSimulatorView.swift */; };
 		B1000000000000000000000B /* LLMDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2000000000000000000000B /* LLMDashboardView.swift */; };
 		B1000000000000000000000C /* FloatingLLMPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2000000000000000000000C /* FloatingLLMPanel.swift */; };
+		C10000000000000000000001 /* ProcessNaming.swift in Sources */ = {isa = PBXBuildFile; fileRef = C20000000000000000000001 /* ProcessNaming.swift */; };
+		C10000000000000000000002 /* AppBreakdownView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C20000000000000000000002 /* AppBreakdownView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -47,6 +49,8 @@
 		B2000000000000000000000A /* ContextSimulatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContextSimulatorView.swift; sourceTree = "<group>"; };
 		B2000000000000000000000B /* LLMDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LLMDashboardView.swift; sourceTree = "<group>"; };
 		B2000000000000000000000C /* FloatingLLMPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloatingLLMPanel.swift; sourceTree = "<group>"; };
+		C20000000000000000000001 /* ProcessNaming.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessNaming.swift; sourceTree = "<group>"; };
+		C20000000000000000000002 /* AppBreakdownView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppBreakdownView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -77,6 +81,8 @@
 				A10000000000000000000014 /* ProcessMemory.swift */,
 				A10000000000000000000015 /* HoverTooltip.swift */,
 				B3000000000000000000000001 /* LLMMode */,
+				C20000000000000000000002 /* AppBreakdownView.swift */,
+				C20000000000000000000001 /* ProcessNaming.swift */,
 				A10000000000000000000016 /* Assets.xcassets */,
 			);
 			path = MenuRAM;
@@ -190,6 +196,8 @@
 				B1000000000000000000000A /* ContextSimulatorView.swift in Sources */,
 				B1000000000000000000000B /* LLMDashboardView.swift in Sources */,
 				B1000000000000000000000C /* FloatingLLMPanel.swift in Sources */,
+				C10000000000000000000002 /* AppBreakdownView.swift in Sources */,
+				C10000000000000000000001 /* ProcessNaming.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
