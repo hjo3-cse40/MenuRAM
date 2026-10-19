@@ -19,6 +19,7 @@ struct UnifiedBarSegments: Equatable {
     var otherApps: UInt64 = 0
     var total: UInt64 = 0
     var gpuCeiling: UInt64 = 0
+    var hasLoadedModel = false
 }
 
 @MainActor
@@ -243,6 +244,7 @@ final class LLMModeModel: ObservableObject {
         var bar = UnifiedBarSegments()
         bar.total = snapshot.totalBytes
         bar.gpuCeiling = snapshot.gpuCeilingBytes
+        bar.hasLoadedModel = !runner.loaded.isEmpty
 
         let loadedTotal = runner.loaded.reduce(0) { $0 + $1.residentBytes }
         let otherLoaded = loadedTotal > heldBySelected ? loadedTotal - heldBySelected : 0

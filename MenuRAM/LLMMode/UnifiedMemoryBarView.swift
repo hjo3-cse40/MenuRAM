@@ -105,7 +105,11 @@ struct UnifiedMemoryBarView: View {
         let columns = [GridItem(.flexible(), alignment: .leading), GridItem(.flexible(), alignment: .leading)]
         return LazyVGrid(columns: columns, alignment: .leading, spacing: 3) {
             legendItem(LLMPalette.systemWired, "System wired", segments.systemWired, "Kernel and GPU memory not owned by a model.")
-            legendItem(LLMPalette.model, "Models", segments.loadedModels + segments.plannedWeights, "Loaded models plus the planned model's weights and compute buffers.")
+            if segments.hasLoadedModel {
+                legendItem(LLMPalette.model, "Models", segments.loadedModels + segments.plannedWeights, "Loaded models plus the planned model's weights and compute buffers.")
+            } else {
+                legendItem(LLMPalette.model, "Planned model", segments.plannedWeights, "The planned model's weights and compute buffers. No model is loaded.")
+            }
             legendItem(LLMPalette.kv, "KV cache", segments.plannedKV, "Projected KV cache at the chosen context and KV type.")
             legendItem(LLMPalette.freezable, "Freezable", segments.freezable, "Browser tabs and Electron renderers that can be paused.")
             legendItem(LLMPalette.otherApps, "Other used", segments.otherApps, "Remaining app memory and the compressor.")

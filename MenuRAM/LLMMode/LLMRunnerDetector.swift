@@ -176,16 +176,22 @@ actor LLMRunnerDetector {
             ))
         }
 
-        if status.bionicRunning, let bionicKey = Self.bionicSessionModelKey() {
-            let bionicEngine = availableEngines.first { $0.sample.groupName == "Bionic" }
+        // Bionic's settings name the model its sessions use even when nothing is loaded, and its
+        // utility workers are ~100 MB. Only an engine that holds a model counts as a load.
+        if status.bionicRunning,
+           let bionicKey = Self.bionicSessionModelKey(),
+           let bionicEngine = availableEngines.first(where: { engine in
+               engine.sample.groupName == "Bionic"
+                   && (engine.role == "llm" || engine.role == "llama-server" || engine.bytes >= Self.engineMinimumBytes)
+           }) {
             let name = Self.lmStudioDisplayName(forKey: bionicKey) ?? bionicKey
             status.loaded.append(LoadedModel(
                 name: name,
                 runner: .bionic,
                 modelKey: bionicKey,
-                residentBytes: bionicEngine?.bytes ?? 0,
+                residentBytes: bionicEngine.bytes,
                 contextLength: nil,
-                pid: bionicEngine?.sample.pid
+                pid: bionicEngine.sample.pid
             ))
         }
 
