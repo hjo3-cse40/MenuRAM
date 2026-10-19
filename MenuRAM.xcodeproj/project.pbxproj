@@ -13,6 +13,20 @@
 		A10000000000000000000004 /* ProcessMemory.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000014 /* ProcessMemory.swift */; };
 		A10000000000000000000005 /* HoverTooltip.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000015 /* HoverTooltip.swift */; };
 		A10000000000000000000006 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000016 /* Assets.xcassets */; };
+		B10000000000000000000001 /* LLMTelemetry.swift in Sources */ = {isa = PBXBuildFile; fileRef = B20000000000000000000001 /* LLMTelemetry.swift */; };
+		B10000000000000000000002 /* KVCacheCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B20000000000000000000002 /* KVCacheCalculator.swift */; };
+		B10000000000000000000003 /* GGUFMetadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = B20000000000000000000003 /* GGUFMetadata.swift */; };
+		B10000000000000000000004 /* LLMRunnerDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = B20000000000000000000004 /* LLMRunnerDetector.swift */; };
+		B10000000000000000000005 /* LaunchCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = B20000000000000000000005 /* LaunchCommand.swift */; };
+		B10000000000000000000006 /* ProcessFreezer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B20000000000000000000006 /* ProcessFreezer.swift */; };
+		B10000000000000000000007 /* LLMModeModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B20000000000000000000007 /* LLMModeModel.swift */; };
+		B10000000000000000000008 /* UnifiedMemoryBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B20000000000000000000008 /* UnifiedMemoryBarView.swift */; };
+		B10000000000000000000009 /* FreezableAppsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B20000000000000000000009 /* FreezableAppsView.swift */; };
+		B1000000000000000000000A /* ContextSimulatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2000000000000000000000A /* ContextSimulatorView.swift */; };
+		B1000000000000000000000B /* LLMDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2000000000000000000000B /* LLMDashboardView.swift */; };
+		B1000000000000000000000C /* FloatingLLMPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2000000000000000000000C /* FloatingLLMPanel.swift */; };
+		C10000000000000000000001 /* ProcessNaming.swift in Sources */ = {isa = PBXBuildFile; fileRef = C20000000000000000000001 /* ProcessNaming.swift */; };
+		C10000000000000000000002 /* AppBreakdownView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C20000000000000000000002 /* AppBreakdownView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -23,6 +37,20 @@
 		A10000000000000000000014 /* ProcessMemory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessMemory.swift; sourceTree = "<group>"; };
 		A10000000000000000000015 /* HoverTooltip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HoverTooltip.swift; sourceTree = "<group>"; };
 		A10000000000000000000016 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		B20000000000000000000001 /* LLMTelemetry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LLMTelemetry.swift; sourceTree = "<group>"; };
+		B20000000000000000000002 /* KVCacheCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KVCacheCalculator.swift; sourceTree = "<group>"; };
+		B20000000000000000000003 /* GGUFMetadata.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GGUFMetadata.swift; sourceTree = "<group>"; };
+		B20000000000000000000004 /* LLMRunnerDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LLMRunnerDetector.swift; sourceTree = "<group>"; };
+		B20000000000000000000005 /* LaunchCommand.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchCommand.swift; sourceTree = "<group>"; };
+		B20000000000000000000006 /* ProcessFreezer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessFreezer.swift; sourceTree = "<group>"; };
+		B20000000000000000000007 /* LLMModeModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LLMModeModel.swift; sourceTree = "<group>"; };
+		B20000000000000000000008 /* UnifiedMemoryBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnifiedMemoryBarView.swift; sourceTree = "<group>"; };
+		B20000000000000000000009 /* FreezableAppsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreezableAppsView.swift; sourceTree = "<group>"; };
+		B2000000000000000000000A /* ContextSimulatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContextSimulatorView.swift; sourceTree = "<group>"; };
+		B2000000000000000000000B /* LLMDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LLMDashboardView.swift; sourceTree = "<group>"; };
+		B2000000000000000000000C /* FloatingLLMPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloatingLLMPanel.swift; sourceTree = "<group>"; };
+		C20000000000000000000001 /* ProcessNaming.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessNaming.swift; sourceTree = "<group>"; };
+		C20000000000000000000002 /* AppBreakdownView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppBreakdownView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -52,6 +80,9 @@
 				A10000000000000000000013 /* MemoryBarView.swift */,
 				A10000000000000000000014 /* ProcessMemory.swift */,
 				A10000000000000000000015 /* HoverTooltip.swift */,
+				B3000000000000000000000001 /* LLMMode */,
+				C20000000000000000000002 /* AppBreakdownView.swift */,
+				C20000000000000000000001 /* ProcessNaming.swift */,
 				A10000000000000000000016 /* Assets.xcassets */,
 			);
 			path = MenuRAM;
@@ -63,6 +94,25 @@
 				A10000000000000000000010 /* MenuRAM.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		B3000000000000000000000001 /* LLMMode */ = {
+			isa = PBXGroup;
+			children = (
+				B20000000000000000000001 /* LLMTelemetry.swift */,
+				B20000000000000000000002 /* KVCacheCalculator.swift */,
+				B20000000000000000000003 /* GGUFMetadata.swift */,
+				B20000000000000000000004 /* LLMRunnerDetector.swift */,
+				B20000000000000000000005 /* LaunchCommand.swift */,
+				B20000000000000000000006 /* ProcessFreezer.swift */,
+				B20000000000000000000007 /* LLMModeModel.swift */,
+				B20000000000000000000008 /* UnifiedMemoryBarView.swift */,
+				B20000000000000000000009 /* FreezableAppsView.swift */,
+				B2000000000000000000000A /* ContextSimulatorView.swift */,
+				B2000000000000000000000B /* LLMDashboardView.swift */,
+				B2000000000000000000000C /* FloatingLLMPanel.swift */,
+			);
+			path = LLMMode;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -134,6 +184,20 @@
 				A10000000000000000000003 /* MemoryBarView.swift in Sources */,
 				A10000000000000000000004 /* ProcessMemory.swift in Sources */,
 				A10000000000000000000005 /* HoverTooltip.swift in Sources */,
+				B10000000000000000000001 /* LLMTelemetry.swift in Sources */,
+				B10000000000000000000002 /* KVCacheCalculator.swift in Sources */,
+				B10000000000000000000003 /* GGUFMetadata.swift in Sources */,
+				B10000000000000000000004 /* LLMRunnerDetector.swift in Sources */,
+				B10000000000000000000005 /* LaunchCommand.swift in Sources */,
+				B10000000000000000000006 /* ProcessFreezer.swift in Sources */,
+				B10000000000000000000007 /* LLMModeModel.swift in Sources */,
+				B10000000000000000000008 /* UnifiedMemoryBarView.swift in Sources */,
+				B10000000000000000000009 /* FreezableAppsView.swift in Sources */,
+				B1000000000000000000000A /* ContextSimulatorView.swift in Sources */,
+				B1000000000000000000000B /* LLMDashboardView.swift in Sources */,
+				B1000000000000000000000C /* FloatingLLMPanel.swift in Sources */,
+				C10000000000000000000002 /* AppBreakdownView.swift in Sources */,
+				C10000000000000000000001 /* ProcessNaming.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
