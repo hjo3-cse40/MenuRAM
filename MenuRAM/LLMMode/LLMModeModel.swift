@@ -100,7 +100,10 @@ final class LLMModeModel: ObservableObject {
     /// The loaded copy of the selected model, if the runner already holds it.
     var selectedLoadedModel: LoadedModel? {
         guard let model = selectedModel else { return nil }
-        return runner.loaded.first { $0.runner == model.runner && $0.name == model.name }
+        return runner.loaded.first { loaded in
+            if let key = loaded.modelKey { return model.name == key || model.aliases.contains(key) }
+            return loaded.runner == model.runner && loaded.name == model.name
+        }
     }
 
     var launchCommand: String {
@@ -117,7 +120,7 @@ final class LLMModeModel: ObservableObject {
         if snapshot.swapActivity == .thrashing { return "⚠︎ swap" }
         guard !runner.loaded.isEmpty else { return nil }
         let headroom = snapshot.gpuCeilingBytes > snapshot.wiredBytes ? snapshot.gpuCeilingBytes - snapshot.wiredBytes : 0
-        return "LLM \(MemoryFormat.gb(headroom)) GB"
+        return "LLM \(MemoryFormat.gb(headroom))G"
     }
 
     // MARK: - Lifecycle

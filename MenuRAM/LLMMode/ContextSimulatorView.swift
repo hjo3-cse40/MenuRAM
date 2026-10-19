@@ -76,12 +76,17 @@ struct ContextSimulatorView: View {
     }
 
     private var sections: [(title: String, models: [CatalogModel])] {
-        let loadedNames = Set(model.runner.loaded.map { "\($0.runner.rawValue):\($0.name)" })
-        let isLoaded: (CatalogModel) -> Bool = { loadedNames.contains("\($0.runner.rawValue):\($0.name)") }
+        let loaded = model.runner.loaded
+        let isLoaded: (CatalogModel) -> Bool = { item in
+            loaded.contains { entry in
+                if let key = entry.modelKey { return item.name == key || item.aliases.contains(key) }
+                return entry.runner == item.runner && entry.name == item.name
+            }
+        }
         let groups: [(String, [CatalogModel])] = [
             ("Loaded now", model.catalog.filter(isLoaded)),
             ("Ollama", model.catalog.filter { $0.runner == .ollama && !isLoaded($0) }),
-            ("LM Studio", model.catalog.filter { $0.runner == .lmStudio && !isLoaded($0) }),
+            ("LM Studio & Bionic", model.catalog.filter { $0.runner == .lmStudio && !isLoaded($0) }),
             ("Typical sizes", model.catalog.filter { $0.id.hasPrefix("preset:") }),
         ]
         return groups.filter { !$0.1.isEmpty }.map { (title: $0.0, models: $0.1) }
@@ -89,7 +94,7 @@ struct ContextSimulatorView: View {
 
     private func label(for item: CatalogModel) -> String {
         let quant = item.quantization.map { " · \($0)" } ?? ""
-        return "\(item.name) (\(MemoryFormat.bytes(item.weightsBytes))\(quant))"
+        return "\(item.label) (\(MemoryFormat.bytes(item.weightsBytes))\(quant))"
     }
 
     private var contextIndex: Binding<Double> {

@@ -13,6 +13,7 @@ final class FloatingLLMPanelController: NSObject, NSWindowDelegate {
         self.model = model
         if let panel {
             panel.orderFrontRegardless()
+            NSApp.activate(ignoringOtherApps: true)
             return
         }
 
@@ -34,6 +35,7 @@ final class FloatingLLMPanelController: NSObject, NSWindowDelegate {
         panel.contentView = NSHostingView(rootView: FloatingLLMPanelView(model: model, panel: panel))
         panel.center()
         panel.orderFrontRegardless()
+        NSApp.activate(ignoringOtherApps: true)
 
         self.panel = panel
         model.setSurface(.panel, active: true)

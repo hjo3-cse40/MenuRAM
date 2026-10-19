@@ -6,7 +6,7 @@ import SwiftUI
 struct MenuRAMApp: App {
     @StateObject private var monitor = MemoryMonitor()
     @StateObject private var llm = LLMModeModel()
-    @AppStorage("panelMode") private var mode: PanelMode = .standard
+    @AppStorage("panelMode") private var mode: PanelMode = .llm
     @State private var hoverInfo: HoverInfo?
     @State private var launchAtLogin = false
     @State private var loginNeedsApproval = false
@@ -34,7 +34,7 @@ struct MenuRAMApp: App {
 
     private var menuBarTitle: String {
         guard let suffix = llm.menuBarSuffix else { return monitor.menuBarTitle }
-        return "\(monitor.menuBarTitle) · \(suffix)"
+        return "\(MemoryFormat.gb(monitor.usedBytes))G · \(suffix)"
     }
 
     private var panel: some View {

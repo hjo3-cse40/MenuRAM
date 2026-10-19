@@ -21,6 +21,8 @@ enum LaunchCommand {
                 lines.append("# Set K/V cache quantization to \(quant.label) in LM Studio's model load settings.")
             }
             return lines.joined(separator: "\n")
+        case .bionic:
+            return "# Bionic loads \(model.name) on demand. Set context to \(context) and K/V cache to \(quant.label) in Bionic's model settings."
         case .llamaServer:
             return llamaServer(path: nil, context: context, quant: quant)
         }

@@ -22,6 +22,18 @@ mkdir -p "$DEST"
 killall MenuRAM 2>/dev/null || true
 rm -rf "$DEST/MenuRAM.app"
 cp -R "$APP" "$DEST/MenuRAM.app"
+
+# Clean up LaunchServices and Spotlight duplicate registrations
+LSREGISTER="/System/Library/Frameworks/CoreServices.framework/Versions/Current/Frameworks/LaunchServices.framework/Versions/Current/Support/lsregister"
+if [ -x "$LSREGISTER" ]; then
+  # Unregister intermediate build products
+  "$LSREGISTER" -u "$APP" 2>/dev/null || true
+  "$LSREGISTER" -u "$DERIVED/Build/Products/Debug/MenuRAM.app" 2>/dev/null || true
+  # Register the newly installed app
+  "$LSREGISTER" -f -trusted "$DEST/MenuRAM.app" 2>/dev/null || true
+  "$LSREGISTER" -gc 2>/dev/null || true
+fi
+
 open "$DEST/MenuRAM.app"
 
 echo "Installed $DEST/MenuRAM.app (Release, no debugger)."

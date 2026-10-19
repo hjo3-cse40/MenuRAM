@@ -102,6 +102,7 @@ struct LLMDashboardView: View {
         var found: [String] = []
         if model.runner.ollamaReachable { found.append("Ollama") }
         if model.runner.lmStudioReachable { found.append("LM Studio") }
+        if model.runner.bionicRunning { found.append("Bionic") }
         if found.isEmpty { return "No local runner detected." }
         return "\(found.joined(separator: " and ")) running, no model loaded."
     }

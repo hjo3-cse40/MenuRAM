@@ -23,6 +23,7 @@ enum ProcessNaming {
         ("/.refact/", "Refact.ai"),
         ("refact", "Refact.ai"),
         ("com.canonical.multipass", "Multipass VM"),
+        ("/.lmstudio/apps/bionic/", "Bionic"),
         ("/.lmstudio/", "LM Studio"),
         ("/.ollama/", "Ollama"),
         ("com.docker", "Docker"),
