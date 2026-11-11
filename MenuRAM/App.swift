@@ -64,6 +64,11 @@ struct MenuRAMApp: App {
                 NSApplication.shared.terminate(nil)
             }
             .keyboardShortcut("q")
+
+            Text(AppBuildInfo.footerText)
+                .font(.system(size: 9))
+                .foregroundStyle(.tertiary)
+                .frame(maxWidth: .infinity, alignment: .trailing)
         }
         .onAppear {
             refreshLoginItemState()
